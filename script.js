@@ -12,6 +12,14 @@ const gameBoard = (() => {
         return _gameFild;
     }
 
+    function cleanBoard() {
+        for (let i = 0; i < _gameFild.length; i++) {
+            for (let j = 0; j < _gameFild[i].length; j++) {
+                _gameFild[i][j] = undefined;
+            } 
+        }
+    }
+
     function isEnd() {
         for (let i = 0; i < _gameFild.length; i++) {
             for (let j = 0; j < _gameFild[i].length; j++) {
@@ -22,7 +30,7 @@ const gameBoard = (() => {
         return true;
     }
 
-    return {getBoard, setBoard, isEnd};
+    return {getBoard, setBoard, isEnd, cleanBoard};
 })();
 
 const Player = (playerName, playerSign) => {
@@ -30,12 +38,10 @@ const Player = (playerName, playerSign) => {
 };
 
 const game = (() => {
+    const gameBoardContainer = document.querySelector('.game-board');
     function renderBoard(boardArr) {
         const allRows = document.querySelectorAll('.row')
         allRows.forEach(row => row.remove());
-
-        const gameBoardContainer = document.querySelector('.game-board');
-        
         for (let i = 0; i < boardArr.length; i++) {
             let row = document.createElement('div');
             row.id = (`row${i}`);
@@ -62,7 +68,7 @@ const game = (() => {
             } 
         }
         if (gameBoard.isEnd()) {
-            console.log('End of game');
+            endWindow();
         }
     }
 
@@ -75,13 +81,62 @@ const game = (() => {
             renderBoard(gameBoard.getBoard());
         }
     }
-    return {renderBoard};
+
+    function startWindow() {
+        renderBoard(gameBoard.getBoard());
+        let startWindow = document.createElement('div');
+        startWindow.classList.add('start-window');
+        gameBoardContainer.appendChild(startWindow);
+        let msgContainer = document.createElement('div');
+        msgContainer.classList.add('msg-container');
+        msgContainer.textContent = 'Start new game';
+        startWindow.appendChild(msgContainer);
+        let startButton = document.createElement('button');
+        startButton.classList.add('start-button');
+        startButton.textContent = 'Start';
+        startWindow.appendChild(startButton);
+        let allSquares = document.querySelectorAll('.square');
+        allSquares.forEach(square => square.removeEventListener('click', fill));
+        startButton.addEventListener('click', startOfGame);
+    }
+    
+    function startOfGame() {
+        renderBoard(gameBoard.getBoard());
+        let startWindow = document.querySelector('.start-window');
+        gameBoardContainer.removeChild(startWindow);
+    }
+
+    function endOfGame() {
+        gameBoard.cleanBoard();
+        renderBoard(gameBoard.getBoard())
+        let endWindow = document.querySelector('.end-window');
+        gameBoardContainer.removeChild(endWindow);
+        startWindow();
+    }
+
+    function endWindow() {
+        let endWindow = document.createElement('div');
+        endWindow.classList.add('end-window');
+        gameBoardContainer.appendChild(endWindow);
+        let msgContainer = document.createElement('div');
+        msgContainer.classList.add('msg-container');
+        msgContainer.textContent = 'The game is over';
+        endWindow.appendChild(msgContainer);
+        let newGameButton = document.createElement('button');
+        newGameButton.classList.add('new-game-button');
+        newGameButton.textContent = 'New';
+        endWindow.appendChild(newGameButton);
+        let allSquares = document.querySelectorAll('.square');
+        allSquares.forEach(square => square.removeEventListener('click', fill));
+        newGameButton.addEventListener('click', endOfGame);
+    }
+
+    return {startWindow};
     
 })();
-
-
 const player1 = Player('Player1', true);
 const player2 = Player('Player2', !player1.playerSign);
-game.renderBoard(gameBoard.getBoard());
+game.startWindow();
+//game.renderBoard(gameBoard.getBoard());
 // console.log(gameBoard.getBoard());
 // console.log(`isEnd: ${gameBoard.isEnd()}`);
