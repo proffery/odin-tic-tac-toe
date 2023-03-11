@@ -25,53 +25,63 @@ const gameBoard = (() => {
     return {getBoard, setBoard, isEnd};
 })();
 
-const player = (playerName, playerSign) => {
+const Player = (playerName, playerSign) => {
     return {playerName, playerSign};
 };
 
 const game = (() => {
-    const player1 = player('Player1', true);
-    const player2 = player('Player2', !player1.playerSign);
-    while (!gameBoard.isEnd()) {
-        gameBoard.setBoard(0, 0, player1.playerSign);
-        gameBoard.setBoard(0, 1, player2.playerSign);
-        gameBoard.setBoard(0, 2, player1.playerSign);
-        gameBoard.setBoard(1, 0, player2.playerSign);
-        gameBoard.setBoard(1, 1, player1.playerSign);
-        gameBoard.setBoard(1, 2, player2.playerSign);
-        gameBoard.setBoard(2, 0, player1.playerSign);
-        gameBoard.setBoard(2, 1, player2.playerSign);
-        gameBoard.setBoard(2, 2, player1.playerSign);
+    function renderBoard(boardArr) {
+        const allRows = document.querySelectorAll('.row')
+        allRows.forEach(row => row.remove());
+
+        const gameBoardContainer = document.querySelector('.game-board');
+        
+        for (let i = 0; i < boardArr.length; i++) {
+            let row = document.createElement('div');
+            row.id = (`row${i}`);
+            row.classList.add('row');
+            gameBoardContainer.appendChild(row);
+            let rowI = document.getElementById(`row${i}`);
+            for (let j = 0; j < boardArr[i].length; j++) {
+                let column = document.createElement('div');
+                column.classList.add('square');
+                column.setAttribute('row', i);
+                column.setAttribute('column', j);
+                column.id = (`square${i}-${j}`);
+                if (boardArr[i][j] === true) {
+                    column.textContent = 'X';
+                }
+                else if (boardArr[i][j] === false) {
+                    column.textContent = 'O';
+                }
+                else {
+                    column.textContent = '';
+                }
+                rowI.appendChild(column);
+                column.addEventListener('click', fill);
+            } 
+        }
+        if (gameBoard.isEnd()) {
+            console.log('End of game');
+        }
     }
+
+    function fill(e) {
+        if (gameBoard.getBoard()[e.target.getAttribute('row')][e.target.getAttribute('column')] !== undefined) {
+            console.log('Fild not empty');
+        }
+        else {
+            gameBoard.setBoard(e.target.getAttribute('row'), e.target.getAttribute('column'), player1.playerSign);
+            renderBoard(gameBoard.getBoard());
+        }
+    }
+    return {renderBoard};
+    
 })();
 
-function renderBoard(boardArr) {
-    const gameBoardContainer = document.querySelector('.game-board');
-    for (let i = 0; i < boardArr.length; i++) {
-        let row = document.createElement('div');
-        row.id = (`row${i}`);
-        row.classList.add('row');
-        gameBoardContainer.appendChild(row);
-        let rowI = document.getElementById(`row${i}`);
-        console.log(`row${i} is created`);
-        for (let j = 0; j < boardArr[i].length; j++) {
-            let column = document.createElement('div');
-            column.classList.add('square');
-            column.id = (`square${i}-${j}`);
-            if (boardArr[i][j]) {
-                column.textContent = 'X';
-            }
-            else {
-                column.textContent = 'O';
-            }
-            rowI.appendChild(column);
-            console.log(`square${j} is created`);
-        } 
-    }
-    
-}
-console.log(renderBoard(gameBoard.getBoard()));
 
-
+const player1 = Player('Player1', true);
+const player2 = Player('Player2', !player1.playerSign);
+game.renderBoard(gameBoard.getBoard());
 // console.log(gameBoard.getBoard());
 // console.log(`isEnd: ${gameBoard.isEnd()}`);

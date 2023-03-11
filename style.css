@@ -12,6 +12,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 2rem;
+    width: 2rem;
     padding: 1rem;
     border: 1px solid;
 }
