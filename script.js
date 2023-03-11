@@ -4,22 +4,51 @@ const gameBoard = (() => {
         _gameFild[i] = new Array(_gameFild.length);
     }
 
-    function setValue(rowNum, columnNum, value) {
+    function setBoard(rowNum, columnNum, value) {
         _gameFild[rowNum][columnNum] = value;
     }
 
-    function getValue() {
+    function getBoard() {
         return _gameFild;
     }
 
+    function isEnd() {
+        for (let i = 0; i < _gameFild.length; i++) {
+            for (let j = 0; j < _gameFild[i].length; j++) {
+                if (_gameFild[i][j] === undefined)
+                return false;
+            } 
+        }
+        return true;
+    }
 
-    // for (let i = 0; i < gameFild.length; i++) {
-    //     for (let j = 0; j < gameFild[i].length; j++) {
-    //         gameFild[i][j] = false;
-    //     } 
-    // }
-    return {getValue, setValue};
+    return {getBoard, setBoard, isEnd};
 })();
 
-gameBoard.setValue(1, 0, false);
-console.log(gameBoard.getValue());
+const player = (playerName, playerSign) => {
+    return {playerName, playerSign};
+};
+
+const game = ((gameBoard, sign) => {
+    const player1 = player('Player1', sign);
+    const player2 = player('Player2', !sign);
+    while (!gameBoard.isEnd()) {
+        
+    }
+
+});
+
+
+
+// gameBoard.setBoard(0, 0, player1.playerSign);
+// gameBoard.setBoard(0, 1, player2.playerSign);
+// gameBoard.setBoard(0, 2, player1.playerSign);
+// gameBoard.setBoard(1, 0, player2.playerSign);
+// gameBoard.setBoard(1, 1, player1.playerSign);
+// gameBoard.setBoard(1, 2, player2.playerSign);
+// gameBoard.setBoard(2, 0, player1.playerSign);
+// gameBoard.setBoard(2, 1, player2.playerSign);
+// gameBoard.setBoard(2, 2, player1.playerSign);
+
+// console.log(gameBoard.getBoard());
+// console.log(`isEnd: ${gameBoard.isEnd()}`);
