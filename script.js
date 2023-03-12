@@ -117,31 +117,86 @@ const game = (() => {
     }
     
     function winnerControl() {
-        if (gameBoard.isWinner()) {
-            return `${playerArr[0].playerName} is WIN!`;
-        }
-
-        else {
-            if (gameBoard.isEnd()) {
-                return 'No winners...';
+         if (playerArr[1].playerName !== 'AI') {
+            if (gameBoard.isWinner()) {
+                return `${playerArr[0].playerName} is WIN!`;
             }
+    
+            else {
+                if (gameBoard.isEnd()) {
+                    return 'No winners...';
+                }
+            }
+        }
+        else {
+
         }
     }
 
     function fill(e) {
-        if (gameBoard.getBoard()[e.target.getAttribute('row')][e.target.getAttribute('column')] !== undefined) {
-            console.log('Fild not empty');
+        if (playerArr[1].playerName !== 'AI') {
+            if (gameBoard.getBoard()[e.target.getAttribute('row')][e.target.getAttribute('column')] !== undefined) {
+                console.log('Fild not empty');
+            }
+            else {
+                gameBoard.setBoard(e.target.getAttribute('row'), e.target.getAttribute('column'), playerArr[0].playerSign);
+                renderBoard(gameBoard.getBoard());
+                nextPlayer();
+            }
         }
+        
         else {
-            gameBoard.setBoard(e.target.getAttribute('row'), e.target.getAttribute('column'), playerArr[0].playerSign);
-            console.log(`isEnd:${gameBoard.isEnd()}`);
-            console.log(`isWinner:${gameBoard.isWinner()}`);
-            renderBoard(gameBoard.getBoard());
-            nextPlayer();
+            if (gameBoard.getBoard()[e.target.getAttribute('row')][e.target.getAttribute('column')] !== undefined) {
+                console.log('Fild not empty');
+            }
+            else {
+                gameBoard.setBoard(e.target.getAttribute('row'), e.target.getAttribute('column'), playerArr[0].playerSign);
+                renderBoard(gameBoard.getBoard());
+                aiMove();
+                renderBoard(gameBoard.getBoard());
+            }
         }
     }
     
-    
+    function aiMove() {
+
+        for (let i = 0; i < gameBoard.getBoard().length; i++) {
+            for (let j = 0; j <gameBoard.getBoard()[i].length; j++) {
+                if (gameBoard.getBoard()[i][j] === undefined) {
+                    gameBoard.setBoard(i, j, playerArr[1].playerSign);
+                }
+            } 
+        }
+        // if (gameBoard.getBoard()[1][1] === undefined) {
+        //     gameBoard.setBoard(1, 1, playerArr[1].playerSign);
+        // }
+        // else if (gameBoard.getBoard()[0][0] === undefined) {
+        //     gameBoard.setBoard(0, 0, playerArr[1].playerSign);
+        // }
+        // else if (gameBoard.getBoard()[0][2] === undefined) {
+        //     gameBoard.setBoard(0, 2, playerArr[1].playerSign);
+        // }
+        // else if (gameBoard.getBoard()[2][2] === undefined) {
+        //     gameBoard.setBoard(2, 2, playerArr[1].playerSign);
+        // }
+        // else if (gameBoard.getBoard()[2][0] === undefined) {
+        //     gameBoard.setBoard(2, 0, playerArr[1].playerSign);
+        // }
+        // else {
+        //     let i = Math.floor(Math.random() * 3);
+        //     let j = Math.floor(Math.random() * 3);
+        //     console.log(i);
+        //     console.log(j);
+        //     while (gameBoard.getBoard()[i][j] === undefined) {
+        //         i = Math.floor(Math.random() * 3);
+        //         j = Math.floor(Math.random() * 3);
+        //         console.log(i);
+        //         console.log(j);
+        //     }
+
+        //     gameBoard.setBoard(i, j, playerArr[1].playerSign);
+        // }
+    }
     
     function nextPlayer() {
         if (!gameBoard.isEnd() && !gameBoard.isWinner()) {
@@ -159,47 +214,85 @@ const game = (() => {
         let startWindow = document.createElement('div');
         startWindow.classList.add('start-window');
         gameBoardContainer.appendChild(startWindow);
+        
         let msgContainer = document.createElement('div');
         msgContainer.classList.add('msg-container');
-        msgContainer.textContent = 'Start new game';
+        msgContainer.textContent = 'New game';
         startWindow.appendChild(msgContainer);
-        let playerMarkContainer = document.createElement('div');
-        playerMarkContainer.classList.add('player-mark-container');
-        playerMarkContainer.textContent = 'Player1'
-        startWindow.appendChild(playerMarkContainer);
-        let markOne = document.createElement('div');
-        markOne.classList.add('mark-one');
-        markOne.textContent = MARK_ONE;
-        markOne.setAttribute('tabindex', '0');
-        playerMarkContainer.appendChild(markOne);
-        let markTwo = document.createElement('div');
-        markTwo.classList.add('mark-two');
-        markTwo.textContent = MARK_TWO;
-        markTwo.setAttribute('tabindex', '1');
-        playerMarkContainer.appendChild(markTwo);
+        
+        let playersContainer = document.createElement('div');
+        playersContainer.classList.add('all-players');
+        startWindow.appendChild(playersContainer);
+        
+        let player1MarkContainer = document.createElement('div');
+        player1MarkContainer.classList.add('player1-mark-container');
+        playersContainer.appendChild(player1MarkContainer);
+        let player2MarkContainer = document.createElement('div');
+        player2MarkContainer.classList.add('player2-mark-container');
+        playersContainer.appendChild(player2MarkContainer);
+
+        player1MarkContainer.innerHTML = `
+        <div>Player1
+            <div>
+                <input type="radio" name="p1" id="p1markOne">
+                <label for="p1markOne">${MARK_ONE}</label>
+            </div>
+            <div>
+                <input type="radio" name="p1" id="p1markTwo">
+                <label for="p1markTwo">${MARK_TWO}</label>
+            </div>
+        </div>
+        `;
+
+        player2MarkContainer.innerHTML = `
+        <div>Player2
+            <div>
+                <input type="radio" name="p2" id="p2markOne">
+                <label for="p2markOne">AI</label>
+                </div>
+                <div>
+                <input type="radio" name="p2" id="p2markTwo">
+                <label for="p2markTwo">Human</label>
+            </div>
+        </div>
+        `;
+
         let startButton = document.createElement('button');
         startButton.classList.add('start-button');
         startButton.textContent = 'Start';
         startWindow.appendChild(startButton);
         let allSquares = document.querySelectorAll('.square');
         allSquares.forEach(square => square.removeEventListener('click', fill));
-        markOne.focus();
-        createPlayer();
-        markOne.addEventListener('click', createPlayer);
-        markTwo.addEventListener('click', createPlayer);
+        startButton.addEventListener('click', createPlayer);
         startButton.addEventListener('click', startOfGame);
     }
 
     function createPlayer() {
-        const element = document.querySelector('.mark-one')
-        if (element === document.activeElement) {
-            playerArr[0] = Player('Player1', true);
-            playerArr[1] = Player('Player2', !playerArr[0].playerSign);
+        const player1 = document.getElementById('p1markOne');
+        const player2 = document.getElementById('p2markOne');
+        if (player2.getAttribute('checked') === '') {
+            if (player1.getAttribute('checked') === '') {
+                playerArr[0] = Player('Player1', true);
+                playerArr[1] = Player('Player2', !playerArr[0].playerSign);
+            }
+            else {
+                playerArr[0] = Player('Player1', false);
+                playerArr[1] = Player('Player2', !playerArr[0].playerSign);
+            }
         }
-        else {
-            playerArr[0] = Player('Player1', false);
-            playerArr[1] = Player('Player2', !playerArr[0].playerSign);
+
+        else if (player2.getAttribute('checked')) {
+            if (player1.getAttribute('checked') == '') {
+                playerArr[0] = Player('Player1', true);
+                playerArr[1] = Player('AI', !playerArr[0].playerSign);
+            }
+            else if (player2.getAttribute('checked')) {
+                playerArr[0] = Player('Player1', false);
+                playerArr[1] = Player('AI', !playerArr[0].playerSign);
+            }
         }
+
+        console.log(playerArr);
     }
 
     function startOfGame() {
@@ -210,6 +303,7 @@ const game = (() => {
 
     function endOfGame() {
         gameBoard.cleanBoard();
+        playerArr.splice(0,playerArr.length);
         renderBoard(gameBoard.getBoard())
         let endWindow = document.querySelector('.end-window');
         gameBoardContainer.removeChild(endWindow);
