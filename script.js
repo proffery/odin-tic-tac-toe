@@ -1,3 +1,5 @@
+const MARK_ONE = 'X';
+const MARK_TWO = 'O';
 const gameBoard = (() => {
     const _gameFild = new Array(3);
     for (let i = 0; i < _gameFild.length; i++) {
@@ -55,10 +57,10 @@ const game = (() => {
                 column.setAttribute('column', j);
                 column.id = (`square${i}-${j}`);
                 if (boardArr[i][j] === true) {
-                    column.textContent = 'X';
+                    column.textContent = MARK_ONE;
                 }
                 else if (boardArr[i][j] === false) {
-                    column.textContent = 'O';
+                    column.textContent = MARK_TWO;
                 }
                 else {
                     column.textContent = '';
@@ -77,7 +79,7 @@ const game = (() => {
             console.log('Fild not empty');
         }
         else {
-            gameBoard.setBoard(e.target.getAttribute('row'), e.target.getAttribute('column'), player1.playerSign);
+            gameBoard.setBoard(e.target.getAttribute('row'), e.target.getAttribute('column'), createPlayer()[0].playerSign);
             renderBoard(gameBoard.getBoard());
         }
     }
@@ -91,6 +93,18 @@ const game = (() => {
         msgContainer.classList.add('msg-container');
         msgContainer.textContent = 'Start new game';
         startWindow.appendChild(msgContainer);
+        let playerMarkContainer = document.createElement('div');
+        playerMarkContainer.classList.add('player-mark-container');
+        startWindow.appendChild(playerMarkContainer);
+        let markOne = document.createElement('div');
+        markOne.classList.add('mark-one');
+        markOne.textContent = MARK_ONE;
+        markOne.addEventListener('click', focus(markOne));
+        playerMarkContainer.appendChild(markOne);
+        let markTwo = document.createElement('div');
+        markTwo.classList.add('mark-two');
+        markTwo.textContent = MARK_TWO;
+        playerMarkContainer.appendChild(markTwo);
         let startButton = document.createElement('button');
         startButton.classList.add('start-button');
         startButton.textContent = 'Start';
@@ -100,6 +114,17 @@ const game = (() => {
         startButton.addEventListener('click', startOfGame);
     }
     
+    function changeFocus(elementOne, elementTwo) {
+        element.focus();
+    }
+
+    function createPlayer(e) {
+        const playerArr = []
+        playerArr[0] = Player('Player1', true);
+        playerArr[1] = Player('Player2', !playerArr[0].playerSign);
+        return playerArr;
+    }
+
     function startOfGame() {
         renderBoard(gameBoard.getBoard());
         let startWindow = document.querySelector('.start-window');
@@ -134,8 +159,7 @@ const game = (() => {
     return {startWindow};
     
 })();
-const player1 = Player('Player1', true);
-const player2 = Player('Player2', !player1.playerSign);
+
 game.startWindow();
 //game.renderBoard(gameBoard.getBoard());
 // console.log(gameBoard.getBoard());
