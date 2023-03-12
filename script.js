@@ -5,20 +5,58 @@ const gameBoard = (() => {
     for (let i = 0; i < _gameFild.length; i++) {
         _gameFild[i] = new Array(_gameFild.length);
     }
-
+    
     function setBoard(rowNum, columnNum, value) {
         _gameFild[rowNum][columnNum] = value;
     }
-
+    
     function getBoard() {
         return _gameFild;
     }
-
+    
     function cleanBoard() {
         for (let i = 0; i < _gameFild.length; i++) {
             for (let j = 0; j < _gameFild[i].length; j++) {
                 _gameFild[i][j] = undefined;
             } 
+        }
+    }
+    
+    function isWinner() {
+        if ((_gameFild[0][0] == _gameFild[0][1]) && (_gameFild[0][1] == _gameFild[0][2]) && (_gameFild[0][0] != undefined)) {
+            return true;
+        }
+
+        else if ((_gameFild[1][0] == _gameFild[1][1]) && (_gameFild[1][1] == _gameFild[1][2]) && (_gameFild[1][0] != undefined)) {
+            return true;
+        }
+
+        else if ((_gameFild[2][0] == _gameFild[2][1]) && (_gameFild[2][1] == _gameFild[2][2]) && (_gameFild[2][0] != undefined)) {
+            return true;
+        }
+
+        else if ((_gameFild[0][0] == _gameFild[1][0]) && (_gameFild[1][0] == _gameFild[2][0]) && (_gameFild[0][0] != undefined)) {
+            return true;
+        }
+
+        else if ((_gameFild[0][1] == _gameFild[1][1]) && (_gameFild[1][1] == _gameFild[2][1]) && (_gameFild[0][1] != undefined)) {
+            return true;
+        }
+
+        else if ((_gameFild[0][2] == _gameFild[1][2]) && (_gameFild[1][2] == _gameFild[2][2]) && (_gameFild[0][2] != undefined)) {
+            return true;
+        }
+
+        else if ((_gameFild[0][0] == _gameFild[1][1]) && (_gameFild[1][1] == _gameFild[2][2]) && (_gameFild[0][0] != undefined)) {
+            return true;
+        }
+
+        else if ((_gameFild[0][2] == _gameFild[1][1]) && (_gameFild[1][1] == _gameFild[2][0]) && (_gameFild[0][2] != undefined)) {
+            return true;
+        }
+
+        else {
+            return false;
         }
     }
 
@@ -31,8 +69,8 @@ const gameBoard = (() => {
         }
         return true;
     }
-
-    return {getBoard, setBoard, isEnd, cleanBoard};
+    
+    return {getBoard, setBoard, isEnd, cleanBoard, isWinner};
 })();
 
 const Player = (playerName, playerSign) => {
@@ -40,7 +78,10 @@ const Player = (playerName, playerSign) => {
 };
 
 const game = (() => {
+    const playerArr = [];
     const gameBoardContainer = document.querySelector('.game-board');
+    const playerMsg = document.createElement('div');
+    
     function renderBoard(boardArr) {
         const allRows = document.querySelectorAll('.row')
         allRows.forEach(row => row.remove());
@@ -51,26 +92,39 @@ const game = (() => {
             gameBoardContainer.appendChild(row);
             let rowI = document.getElementById(`row${i}`);
             for (let j = 0; j < boardArr[i].length; j++) {
-                let column = document.createElement('div');
-                column.classList.add('square');
-                column.setAttribute('row', i);
-                column.setAttribute('column', j);
-                column.id = (`square${i}-${j}`);
+                let square = document.createElement('div');
+                square.classList.add('square');
+                square.setAttribute('row', i);
+                square.setAttribute('column', j);
+                square.id = (`square${i}-${j}`);
                 if (boardArr[i][j] === true) {
-                    column.textContent = MARK_ONE;
+                    square.textContent = MARK_ONE;
                 }
                 else if (boardArr[i][j] === false) {
-                    column.textContent = MARK_TWO;
+                    square.textContent = MARK_TWO;
                 }
                 else {
-                    column.textContent = '';
+                    square.textContent = '';
                 }
-                rowI.appendChild(column);
-                column.addEventListener('click', fill);
+                rowI.appendChild(square);
+                square.addEventListener('click', fill);
             } 
         }
-        if (gameBoard.isEnd()) {
+        if (gameBoard.isEnd() || gameBoard.isWinner()) {
+            playerMsg.remove();
             endWindow();
+        }
+    }
+    
+    function winnerControl() {
+        if (gameBoard.isWinner()) {
+            return `${playerArr[0].playerName} is WIN!`;
+        }
+
+        else {
+            if (gameBoard.isEnd()) {
+                return 'No winners...';
+            }
         }
     }
 
@@ -79,8 +133,24 @@ const game = (() => {
             console.log('Fild not empty');
         }
         else {
-            gameBoard.setBoard(e.target.getAttribute('row'), e.target.getAttribute('column'), createPlayer()[0].playerSign);
+            gameBoard.setBoard(e.target.getAttribute('row'), e.target.getAttribute('column'), playerArr[0].playerSign);
+            console.log(`isEnd:${gameBoard.isEnd()}`);
+            console.log(`isWinner:${gameBoard.isWinner()}`);
             renderBoard(gameBoard.getBoard());
+            nextPlayer();
+        }
+    }
+    
+    
+    
+    function nextPlayer() {
+        if (!gameBoard.isEnd() && !gameBoard.isWinner()) {
+            playerMsg.classList.add('player-msg');
+            playerMsg.textContent = `${playerArr[1].playerName} your move:`;
+            gameBoardContainer.appendChild(playerMsg);
+            let temp = playerArr[0];
+            playerArr[0] = playerArr[1];
+            playerArr[1] = temp;
         }
     }
 
@@ -95,15 +165,17 @@ const game = (() => {
         startWindow.appendChild(msgContainer);
         let playerMarkContainer = document.createElement('div');
         playerMarkContainer.classList.add('player-mark-container');
+        playerMarkContainer.textContent = 'Player1'
         startWindow.appendChild(playerMarkContainer);
         let markOne = document.createElement('div');
         markOne.classList.add('mark-one');
         markOne.textContent = MARK_ONE;
-        markOne.addEventListener('click', focus(markOne));
+        markOne.setAttribute('tabindex', '0');
         playerMarkContainer.appendChild(markOne);
         let markTwo = document.createElement('div');
         markTwo.classList.add('mark-two');
         markTwo.textContent = MARK_TWO;
+        markTwo.setAttribute('tabindex', '1');
         playerMarkContainer.appendChild(markTwo);
         let startButton = document.createElement('button');
         startButton.classList.add('start-button');
@@ -111,18 +183,23 @@ const game = (() => {
         startWindow.appendChild(startButton);
         let allSquares = document.querySelectorAll('.square');
         allSquares.forEach(square => square.removeEventListener('click', fill));
+        markOne.focus();
+        createPlayer();
+        markOne.addEventListener('click', createPlayer);
+        markTwo.addEventListener('click', createPlayer);
         startButton.addEventListener('click', startOfGame);
     }
-    
-    function changeFocus(elementOne, elementTwo) {
-        element.focus();
-    }
 
-    function createPlayer(e) {
-        const playerArr = []
-        playerArr[0] = Player('Player1', true);
-        playerArr[1] = Player('Player2', !playerArr[0].playerSign);
-        return playerArr;
+    function createPlayer() {
+        const element = document.querySelector('.mark-one')
+        if (element === document.activeElement) {
+            playerArr[0] = Player('Player1', true);
+            playerArr[1] = Player('Player2', !playerArr[0].playerSign);
+        }
+        else {
+            playerArr[0] = Player('Player1', false);
+            playerArr[1] = Player('Player2', !playerArr[0].playerSign);
+        }
     }
 
     function startOfGame() {
@@ -136,6 +213,7 @@ const game = (() => {
         renderBoard(gameBoard.getBoard())
         let endWindow = document.querySelector('.end-window');
         gameBoardContainer.removeChild(endWindow);
+        playerMsg.remove();
         startWindow();
     }
 
@@ -145,7 +223,7 @@ const game = (() => {
         gameBoardContainer.appendChild(endWindow);
         let msgContainer = document.createElement('div');
         msgContainer.classList.add('msg-container');
-        msgContainer.textContent = 'The game is over';
+        msgContainer.textContent = winnerControl();
         endWindow.appendChild(msgContainer);
         let newGameButton = document.createElement('button');
         newGameButton.classList.add('new-game-button');
