@@ -27,7 +27,7 @@ body {
 .start-window, .end-window {
     position: fixed;
     left: 50%;
-    top: 30%;
+    top: 40%;
     width: 15rem;
     transform: translateX(-50%);
     padding-left: .5rem;
