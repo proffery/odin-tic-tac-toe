@@ -1,5 +1,21 @@
+@font-face {
+    font-family: main-font;
+    src: url(./VT323-Regular.ttf);
+}
+
+:root {
+    --main-font: clamp(16px, 1.6vw, 1.5rem);
+    --title-font: clamp(20px, 3vw, 5rem);
+    --font-color: rgb(80, 233, 80);
+    --background-color: black;
+}
+
 body {
     margin: 0;
+    font-size: var(--main-font);
+    font-family: main-font;
+    background-color: var(--background-color);
+    color: var(--font-color);
 }
 
 .main-container {
@@ -17,6 +33,7 @@ body {
     width: 2rem;
     padding: 1rem;
     border: 1px solid;
+    font-size: var(--title-font);
 }
 
 .row {
@@ -27,14 +44,14 @@ body {
 .start-window, .end-window {
     position: fixed;
     left: 50%;
-    top: 40%;
+    top: 13%;
     width: 15rem;
     transform: translateX(-50%);
     padding-left: .5rem;
     padding-right: .5rem;
     padding-bottom: 1rem;
     border: 1px solid;
-    background-color: white;
+    background-color: var(--background-color);
 }
 
 .start-button, .new-game-button {
@@ -70,3 +87,41 @@ body {
     justify-content: center;
     margin: 1rem;
 }
+
+.footer {
+    position: sticky;
+    display: flex;
+    margin: 20px;
+    margin-bottom: 0;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--main-font) - 3px);
+}
+
+.github-mark {
+    width: var(--main-font);
+    filter: invert();
+    transition: all .3s;
+}
+
+.github-mark:hover {
+    transform: rotate(360deg);
+}
+
+a {
+    color: var(--font-color);
+}
+
+h1 {
+    font-size: var(--title-font);
+}
+
+button {
+    color: var(--font-color);
+    background-color: var(--background-color);
+    border: 1px solid var(--font-color);
+}
+
+input[type="radio"]:checked:before{
+    background-color:green;
+    }

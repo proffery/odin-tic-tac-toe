@@ -228,7 +228,7 @@ const game = (() => {
                 </div>
                 <div>
                 <input type="radio" name="p2" id="p2markTwo">
-                <label for="p2markTwo">HUM</label>
+                <label for="p2markTwo">Human</label>
             </div>
         </div>
         `;
