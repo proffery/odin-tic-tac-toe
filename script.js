@@ -1,5 +1,5 @@
-const MARK_ONE = 'X';
-const MARK_TWO = 'O';
+const MARK_ONE = '✗';
+const MARK_TWO = '০';
 const gameBoard = (() => {
     const _gameFild = new Array(3);
     for (let i = 0; i < _gameFild.length; i++) {
@@ -24,39 +24,39 @@ const gameBoard = (() => {
     
     function isWinner() {
         if ((_gameFild[0][0] == _gameFild[0][1]) && (_gameFild[0][1] == _gameFild[0][2]) && (_gameFild[0][0] != undefined)) {
-            return true;
+            return _gameFild[0][0];
         }
 
         else if ((_gameFild[1][0] == _gameFild[1][1]) && (_gameFild[1][1] == _gameFild[1][2]) && (_gameFild[1][0] != undefined)) {
-            return true;
+            return _gameFild[1][0];
         }
 
         else if ((_gameFild[2][0] == _gameFild[2][1]) && (_gameFild[2][1] == _gameFild[2][2]) && (_gameFild[2][0] != undefined)) {
-            return true;
+            return _gameFild[2][0];
         }
 
         else if ((_gameFild[0][0] == _gameFild[1][0]) && (_gameFild[1][0] == _gameFild[2][0]) && (_gameFild[0][0] != undefined)) {
-            return true;
+            return _gameFild[0][0];
         }
 
         else if ((_gameFild[0][1] == _gameFild[1][1]) && (_gameFild[1][1] == _gameFild[2][1]) && (_gameFild[0][1] != undefined)) {
-            return true;
+            return _gameFild[0][1];
         }
 
         else if ((_gameFild[0][2] == _gameFild[1][2]) && (_gameFild[1][2] == _gameFild[2][2]) && (_gameFild[0][2] != undefined)) {
-            return true;
+            return _gameFild[0][2];
         }
 
         else if ((_gameFild[0][0] == _gameFild[1][1]) && (_gameFild[1][1] == _gameFild[2][2]) && (_gameFild[0][0] != undefined)) {
-            return true;
+            return _gameFild[0][0];
         }
 
         else if ((_gameFild[0][2] == _gameFild[1][1]) && (_gameFild[1][1] == _gameFild[2][0]) && (_gameFild[0][2] != undefined)) {
-            return true;
+            return _gameFild[0][2];
         }
 
         else {
-            return false;
+            return 0;
         }
     }
 
@@ -110,15 +110,15 @@ const game = (() => {
                 square.addEventListener('click', fill);
             } 
         }
-        if (gameBoard.isEnd() || gameBoard.isWinner()) {
-            playerMsg.remove();
+        if (gameBoard.isEnd() || gameBoard.isWinner() !== 0) {
+            // playerMsg.remove();
             endWindow();
         }
     }
     
     function winnerControl() {
          if (playerArr[1].playerName !== 'AI') {
-            if (gameBoard.isWinner()) {
+            if (gameBoard.isWinner() !== 0) {
                 return `${playerArr[0].playerName} is WIN!`;
             }
     
@@ -129,7 +129,19 @@ const game = (() => {
             }
         }
         else {
-
+            if (gameBoard.isWinner() !== 0) {
+                if (playerArr[0].playerSign === gameBoard.isWinner()) {
+                    return `${playerArr[0].playerName} is WIN!`;
+                }
+                else {
+                    return `${playerArr[1].playerName} is WIN!`;
+                }
+            }
+            else {
+                if (gameBoard.isEnd()) {
+                    return 'No winners...';
+                }
+            }
         }
     }
 
@@ -159,20 +171,22 @@ const game = (() => {
     }
     
     function aiMove() {
-        if (gameBoard.getBoard()[1][1] === undefined) {
-            gameBoard.setBoard(1, 1, playerArr[1].playerSign);
-        }
-        else if (gameBoard.getBoard()[0][0] === undefined) {
-            gameBoard.setBoard(0, 0, playerArr[1].playerSign);
-        }
-        else if (gameBoard.getBoard()[0][2] === undefined) {
-            gameBoard.setBoard(0, 2, playerArr[1].playerSign);
-        }
-        else if (gameBoard.getBoard()[2][2] === undefined) {
-            gameBoard.setBoard(2, 2, playerArr[1].playerSign);
-        }
-        else if (gameBoard.getBoard()[2][0] === undefined) {
-            gameBoard.setBoard(2, 0, playerArr[1].playerSign);
+        if (!gameBoard.isEnd() && !gameBoard.isWinner()) {
+            if (gameBoard.getBoard()[1][1] === undefined) {
+                gameBoard.setBoard(1, 1, playerArr[1].playerSign);
+            }
+            else if (gameBoard.getBoard()[0][0] === undefined) {
+                gameBoard.setBoard(0, 0, playerArr[1].playerSign);
+            }
+            else if (gameBoard.getBoard()[0][2] === undefined) {
+                gameBoard.setBoard(0, 2, playerArr[1].playerSign);
+            }
+            else if (gameBoard.getBoard()[2][2] === undefined) {
+                gameBoard.setBoard(2, 2, playerArr[1].playerSign);
+            }
+            else if (gameBoard.getBoard()[2][0] === undefined) {
+                gameBoard.setBoard(2, 0, playerArr[1].playerSign);
+            }
         }
     }
     
@@ -214,7 +228,7 @@ const game = (() => {
         playersContainer.appendChild(player2MarkContainer);
 
         player1MarkContainer.innerHTML = `
-        <div>Player1
+        <div>Player 1:
             <div>
                 <input type="radio" name="p1" id="p1markOne" checked>
                 <label for="p1markOne">${MARK_ONE}</label>
@@ -227,7 +241,7 @@ const game = (() => {
         `;
 
         player2MarkContainer.innerHTML = `
-        <div>Player2
+        <div>Player 2:
             <div>
                 <input type="radio" name="p2" id="p2markOne" checked>
                 <label for="p2markOne">AI</label>
@@ -246,14 +260,13 @@ const game = (() => {
         let allSquares = document.querySelectorAll('.square');
         allSquares.forEach(square => square.removeEventListener('click', fill));
         startButton.addEventListener('click', createPlayer);
-        startButton.addEventListener('click', startOfGame);
     }
 
     function createPlayer() {
         const player1 = document.getElementById('p1markOne');
         const player2 = document.getElementById('p2markOne');
         if (!player2.checked) {
-            if (!player1.checked) {
+            if (player1.checked) {
                 playerArr[0] = Player('Player1', true);
                 playerArr[1] = Player('Player2', !playerArr[0].playerSign);
             }
@@ -264,7 +277,7 @@ const game = (() => {
         }
 
         else {
-            if (!player1.checked) {
+            if (player1.checked) {
                 playerArr[0] = Player('Player1', true);
                 playerArr[1] = Player('AI', !playerArr[0].playerSign);
             }
@@ -273,7 +286,7 @@ const game = (() => {
                 playerArr[1] = Player('AI', !playerArr[0].playerSign);
             }
         }
-
+        startOfGame();
         console.log(playerArr);
     }
 
@@ -284,16 +297,16 @@ const game = (() => {
     }
 
     function endOfGame() {
+        playerMsg.remove();
         gameBoard.cleanBoard();
         playerArr.splice(0,playerArr.length);
-        renderBoard(gameBoard.getBoard())
+        startWindow();
         let endWindow = document.querySelector('.end-window');
         gameBoardContainer.removeChild(endWindow);
-        playerMsg.remove();
-        startWindow();
     }
 
     function endWindow() {
+        playerMsg.remove();
         let endWindow = document.createElement('div');
         endWindow.classList.add('end-window');
         gameBoardContainer.appendChild(endWindow);
