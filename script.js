@@ -174,10 +174,11 @@ const game = (() => {
     }
     
     function nextPlayer() {
+        const header = document.querySelector('.header');
         if (!gameBoard.isEnd() && !gameBoard.isWinner()) {
             playerMsg.classList.add('player-msg');
             playerMsg.textContent = `${playerArr[1].playerName} your move:`;
-            gameBoardContainer.appendChild(playerMsg);
+            header.appendChild(playerMsg);
             let temp = playerArr[0];
             playerArr[0] = playerArr[1];
             playerArr[1] = temp;
