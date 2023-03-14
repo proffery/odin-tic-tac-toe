@@ -45,7 +45,7 @@ body {
     
     position: fixed;
     top: 14%;
-    width: 15rem;
+    width: 16rem;
     transform: translateX(-300%);
     padding-left: .5rem;
     padding-right: .5rem;
@@ -56,7 +56,7 @@ body {
 }
 
 .start-window, .end-window {
-    transform: translateX(-13%);
+    transform: translateX(-14%);
     opacity: .9;
 }
 
