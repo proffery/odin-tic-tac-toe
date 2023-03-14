@@ -2,6 +2,7 @@ const MARK_ONE = '✗';
 const MARK_TWO = '০';
 const PLAYER_ONE = 'Player 1';
 const PLAYER_TWO = 'Player 2';
+const AI_NAME = 'AI';
 const gameBoard = (() => {
     const _gameFild = new Array(3);
     for (let i = 0; i < _gameFild.length; i++) {
@@ -135,9 +136,9 @@ const game = (() => {
     }
 
     function fill(e) {
-        if (playerArr[1].playerName !== 'AI') {
+        if (playerArr[1].playerName !== AI_NAME) {
             if (gameBoard.getBoard()[e.target.getAttribute('row')][e.target.getAttribute('column')] !== undefined) {
-                console.log('Fild not empty');
+                errorInput();
             }
             else {
                 gameBoard.setBoard(e.target.getAttribute('row'), e.target.getAttribute('column'), playerArr[0].playerSign);
@@ -148,13 +149,15 @@ const game = (() => {
         
         else {
             if (gameBoard.getBoard()[e.target.getAttribute('row')][e.target.getAttribute('column')] !== undefined) {
-                console.log('Fild not empty');
+                errorInput();
             }
             else {
                 gameBoard.setBoard(e.target.getAttribute('row'), e.target.getAttribute('column'), playerArr[0].playerSign);
                 renderBoard(gameBoard.getBoard());
-                aiMove();
-                renderBoard(gameBoard.getBoard());
+                if (!gameBoard.isEnd() && gameBoard.isWinner() == 0) {
+                    aiMove();
+                    renderBoard(gameBoard.getBoard());
+                }
             }
         }
     }
@@ -184,7 +187,10 @@ const game = (() => {
     function startWindow() {
         renderBoard(gameBoard.getBoard());
         let startWindow = document.createElement('div');
-        startWindow.classList.add('start-window');
+        startWindow.classList.add('start-window-before');
+        setTimeout(() => {
+            startWindow.classList.add('start-window');
+        }, "100");
         gameBoardContainer.appendChild(startWindow);
         
         let msgContainer = document.createElement('div');
@@ -208,7 +214,7 @@ const game = (() => {
         playersContainer.appendChild(player2MarkContainer);
 
         player1MarkContainer.innerHTML = `
-        <div>Player 1:
+        <div>${PLAYER_ONE}:
             <div>
                 <input type="radio" name="p1" id="p1markOne" checked>
                 <label for="p1markOne">${MARK_ONE}</label>
@@ -221,14 +227,14 @@ const game = (() => {
         `;
 
         player2MarkContainer.innerHTML = `
-        <div>Player 2:
+        <div>${PLAYER_TWO}:
             <div>
                 <input type="radio" name="p2" id="p2markOne" checked>
-                <label for="p2markOne">AI</label>
+                <label for="p2markOne">${AI_NAME}</label>
                 </div>
                 <div>
                 <input type="radio" name="p2" id="p2markTwo">
-                <label for="p2markTwo">Human</label>
+                <label for="p2markTwo">${PLAYER_TWO}</label>
             </div>
         </div>
         `;
@@ -242,8 +248,18 @@ const game = (() => {
         startButton.addEventListener('click', createPlayer);
     }
     
-    function createPlayer() {
+    function errorInput() {
+        const beep = document.getElementById('beep');
+        beep.play();
+        gameBoardContainer.classList.add('error');
+        setTimeout(() => {
+            gameBoardContainer.classList.remove('error');
+        }, "300");
 
+    }
+
+    function createPlayer() {
+        playerArr.length = 0;
         const player1 = document.getElementById('p1markOne');
         const player2 = document.getElementById('p2markOne');
         if (!player2.checked) {
@@ -259,34 +275,35 @@ const game = (() => {
 
         else {
             if (player1.checked) {
-                playerArr[0] = Player('Player 1', true);
-                playerArr[1] = Player('AI', !playerArr[0].playerSign);
+                playerArr[0] = Player(PLAYER_ONE, true);
+                playerArr[1] = Player(AI_NAME, !playerArr[0].playerSign);
             }
             else {
-                playerArr[0] = Player('Player 1', false);
-                playerArr[1] = Player('AI', !playerArr[0].playerSign);
+                playerArr[0] = Player(PLAYER_ONE, false);
+                playerArr[1] = Player(AI_NAME, !playerArr[0].playerSign);
             }
         }
 
         let startWindow = document.querySelector('.start-window');
         gameBoardContainer.removeChild(startWindow);
         renderBoard(gameBoard.getBoard());
-
-        console.log(playerArr);
     }
 
     function endOfGame() {
+        let endWindow = document.querySelector('.end-window');
+        gameBoardContainer.removeChild(endWindow);
         playerMsg.remove();
         gameBoard.cleanBoard();
         startWindow();
-        let endWindow = document.querySelector('.end-window');
-        gameBoardContainer.removeChild(endWindow);
     }
 
     function endWindow() {
         playerMsg.remove();
         let endWindow = document.createElement('div');
-        endWindow.classList.add('end-window');
+        endWindow.classList.add('end-window-before');
+        setTimeout(() => {
+            endWindow.classList.add('end-window');
+        }, "100");
         gameBoardContainer.appendChild(endWindow);
         let msgContainer = document.createElement('div');
         msgContainer.classList.add('msg-container');
@@ -300,12 +317,7 @@ const game = (() => {
         allSquares.forEach(square => square.removeEventListener('click', fill));
         newGameButton.addEventListener('click', endOfGame);
     }
-
     return {startWindow};
-    
 })();
 
 game.startWindow();
-//game.renderBoard(gameBoard.getBoard());
-// console.log(gameBoard.getBoard());
-// console.log(`isEnd: ${gameBoard.isEnd()}`);
