@@ -109,6 +109,7 @@ body {
     display: flex;
     bottom: 0;
     left: 35%;
+    transform: translateX(3%);
     align-items: center;
     justify-content: center;
     font-size: calc(var(--main-font) - 3px);
