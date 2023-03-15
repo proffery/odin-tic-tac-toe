@@ -105,10 +105,10 @@ body {
 }
 
 .footer {
-    position: sticky;
+    position: fixed;
     display: flex;
-    margin: 1rem;
-    margin-bottom: 0;
+    bottom: 0;
+    left: 35%;
     align-items: center;
     justify-content: center;
     font-size: calc(var(--main-font) - 3px);
